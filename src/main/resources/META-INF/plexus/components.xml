@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+    <components>
+        <component>
+            <role>de.qaware.maven.plugin.offline.DependencyDownloader</role>
+            <role-hint>default</role-hint>
+            <implementation>de.qaware.maven.plugin.offline.DependencyDownloader</implementation>
+            <description/>
+            <isolated-realm>false</isolated-realm>
+        </component>
+    </components>
+</component-set>
