@@ -152,4 +152,11 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-qaware-oss</id>
+            <url>https://api.bintray.com/maven/qaware-oss/maven/go-offline-maven-plugin;publish=1</url>
+        </repository>
+    </distributionManagement>
 </project>
