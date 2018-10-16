@@ -1,4 +1,7 @@
 # Go Offline Maven Plugin
+[![Build Status](https://travis-ci.org/qaware/go-offline-maven-plugin.svg?branch=master)](https://travis-ci.org/qaware/go-offline-maven-plugin)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Maven Plugin used to download all Dependencies and Plugins required in a Maven build,
 so the build can be run without an internet connection afterwards.
 
