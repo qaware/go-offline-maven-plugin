@@ -37,7 +37,7 @@ Make sure to configure any dynamic dependency your project has (see below).
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>1.0.0</version>
         <configuration>
             <dynamicDependencies>
                 <DynamicDependency>
