@@ -8,7 +8,10 @@ so the build can be run without an internet connection afterwards.
 This is especially relevant with modern CI-Systems like Gitlab and Circle-CI that
 need a consistent local Maven repository in their cache to build efficiently.
 
-Maven already has an official to do this: The maven-dependency-plugin go-offline goal
+The plugin can also be used to download all source files of all transitive dependencies
+of a project.
+
+Maven already has an official to do all this: The maven-dependency-plugin go-offline goal
 Unfortunately, the go-offline plugin suffers from several drawbacks:
 
 - Multi-Module builds are not supported since the plugin tries to download Reactor-Dependencies from the Remote Repository
@@ -23,12 +26,12 @@ The Go Offline Maven Plugin fixes these drawbacks.
 
 ## Goals
 The Go Offline Maven Plugin only has one goal: "resolve-dependencies". This goal downloads
-all external Dependencies and Plugins needed for your build to your local Repository.
-Dependencies that are built inside the reactor build of your project are excluded. For Downloading,
+all external dependencies and plugins needed for your build to your local repository.
+Dependencies that are built inside the reactor build of your project are excluded. For downloading,
 the repositories specified in your pom.xml are used.
 
 ## Usage
-Simply add the plugin to the pom.xml of your project. Use the Root Reactor pom in case of a multi module project.
+Simply add the plugin to the pom.xml of your project. Use the root reactor pom in case of a multi module project.
 Make sure to configure any dynamic dependency your project has (see below).
 
     <plugin>
@@ -47,7 +50,7 @@ Make sure to configure any dynamic dependency your project has (see below).
         </configuration>
     </plugin>
     
-To download all depenencies to your local repository, use
+To download all dependencies to your local repository, use
     
     mvn de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
 
@@ -88,6 +91,43 @@ or a command line parameter.
 or
 
     mvn de.qaware.maven:go-offline-maven-plugin:resolve-dependencies -DdownloadSources
+    
+### Usage in CI environments
+The Go Offline Maven Plugin can be used to build a clean repository for build server environments. The resulting repository includes exactly the dependencies and
+plugins needed for building the project.
+
+#### Gitlab
+
+For gitlab, add the following build step at the front of your pipeline:
+
+    download-dependencies:
+      image: maven:3-jdk-8
+      stage: prepare
+      script:
+        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.0.0:resolve-dependencies -Dmaven.repo.local=.m2/repository'
+      cache:
+        key: M2_REPO
+        paths:
+          - .m2/repository
+          
+This will fill the cache "M2_REPO" with all needed artifacts, reusing the previous "M2_REPO" cache to avoid downloading all artifacts on each run.
+
+Build steps using the repository may then be configured like this:
+
+    .build
+      image: maven:3-jdk-8
+      stage: build
+      script:
+        - 'mvn install -Dmaven.repo.local=.m2/repository'
+      cache:
+        key: M2_REPO
+        paths:
+          - .m2/repository
+        policy: pull
+
+This will pull the previously filled cache into the build image and use it as the local maven repository.
+Policy: pull ensures that artifacts that are generated as part of the build are not written back to the cache
+                                                                                                             .
     
 ## License
 
