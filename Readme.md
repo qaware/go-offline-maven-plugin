@@ -6,18 +6,18 @@
 Maven Plugin used to download all Dependencies and Plugins required in a Maven build,
 so the build can be run without an internet connection afterwards.
 
-This is especially relevant with modern CI-Systems like Gitlab and Circle-CI that
+This is especially relevant for modern CI-Systems like Gitlab and Circle-CI which
 need a consistent local Maven repository in their cache to build efficiently.
 
 The plugin can also be used to download all source files of all transitive dependencies
 of a project.
 
-Maven already has an official to do all this: The maven-dependency-plugin go-offline goal
+Maven already has an official way to do all this: the maven-dependency-plugin go-offline goal;  
 Unfortunately, the go-offline plugin suffers from several drawbacks:
 
-- Multi-Module builds are not supported since the plugin tries to download Reactor-Dependencies from the Remote Repository
+- Multi-Module builds are not supported since the plugin tries to download reactor-dependencies from the remote repository
 - Most parameters simply do not work
-- No option to download dynamic dependencies
+- There is no option to download dynamic dependencies
 
 The Go Offline Maven Plugin fixes these drawbacks.  
 
@@ -55,17 +55,17 @@ To download all dependencies to your local repository, use
     
     mvn de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
 
-Make sure to activate any Profiles etc. so that all relevant modules of your project are included
+Make sure to activate any profiles etc. so that all relevant modules of your project are included
 in the Maven run.
 
 ### Dynamic Dependencies
 Unfortunately some Maven Plugins dynamically load additional dependencies when they are run. Since those
 dependencies are not necessarily specified anywhere in the plugins pom.xml, the Go Offline Maven Plugin
 cannot know that it has to download those dependencies. Most prominently, the surefire-maven-plugin dynamically
-loads test-providers based on test it finds in your project.
+loads test-providers based on the tests it finds in the project.
 
 You must tell the Go Offline Maven Plugin of those dynamic depenencies to ensure all dependencies are downloaded.
-For each Dependency, add a DynamicDependency block to the plugins configuration as seen in the Usage section.
+For each dependency, add a DynamicDependency block to the plugin's configuration as seen in the [Usage](#usage-in-ci-environments) section.
 Each dynamic dependency block consists of four parameters:
 
 - *groupId* The GroupId of the dynamic dependency to download
@@ -77,7 +77,7 @@ Note that Plugins are not consistent about where they pull their dynamic depende
 , some the Main-Repository. If one doesn't work, try the other.
 
 ### Downloading Sources
-The plugin can also download the source files of the projects transitive dependencies. This behaviour can either be activated via the pom.xml
+The plugin can also download the source files of the project's transitive dependencies. This behaviour can either be activated via the pom.xml
 or a command line parameter.
 
     <plugin>
@@ -99,7 +99,7 @@ plugins needed for building the project.
 
 #### Gitlab
 
-For gitlab, add the following build step at the front of your pipeline:
+For gitlab, add the following build step to the front of your pipeline:
 
     download-dependencies:
       image: maven:3-jdk-8
