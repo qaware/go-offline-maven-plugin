@@ -78,6 +78,7 @@ public class DependencyDownloader {
     private List<RepositoryException> errors;
 
     private boolean downloadSources = false;
+    private boolean downloadJavadoc = false;
 
     /**
      * Initialize the DependencyDownloader
@@ -122,6 +123,12 @@ public class DependencyDownloader {
         this.downloadSources = true;
     }
 
+
+    public void enableDownloadJavadoc() {
+        this.downloadJavadoc = true;
+    }
+
+
     /**
      * Download all dependencies of a maven project including transitive dependencies.
      * Dependencies that refer to an artifact in the current reactor build are ignored.
@@ -161,27 +168,46 @@ public class DependencyDownloader {
         try {
             DependencyResult dependencyResult = repositorySystem.resolveDependencies(remoteSession, dependencyRequest);
             downloadSources(dependencyResult);
+            downloadJavadoc(dependencyResult);
         } catch (RepositoryException e) {
             log.error("Error resolving dependencies for project " + project.getGroupId() + ":" + project.getArtifactId());
             handleRepositoryException(e);
         }
     }
 
-    private void downloadSources(DependencyResult dependencyResult) throws ArtifactResolutionException {
+    private void downloadSources(DependencyResult dependencyResult) {
         if (!downloadSources) {
             return;
         }
+
+        downloadAdditionalArtifact(dependencyResult, "sources");
+
+    }
+
+    private void downloadJavadoc(DependencyResult dependencyResult) {
+        if (!downloadJavadoc) {
+            return;
+        }
+        downloadAdditionalArtifact(dependencyResult, "javadoc");
+    }
+
+    private void downloadAdditionalArtifact(DependencyResult dependencyResult, String classifier) {
         ArrayList<ArtifactRequest> requests = new ArrayList<>();
         for (ArtifactResult artifactResult : dependencyResult.getArtifactResults()) {
             Artifact artifact = artifactResult.getArtifact();
             if (!artifact.getExtension().equals("jar")) {
                 continue;
             }
-            DefaultArtifact sourceArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "sources", artifact.getExtension(), artifact.getVersion());
+            DefaultArtifact sourceArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), classifier, artifact.getExtension(), artifact.getVersion());
             requests.add(new ArtifactRequest(sourceArtifact, remoteRepositories, "project"));
         }
-        repositorySystem.resolveArtifacts(remoteSession, requests);
+        try {
+            repositorySystem.resolveArtifacts(remoteSession, requests);
+        } catch (ArtifactResolutionException e) {
+            handleAdditionalArtifactException(e, classifier);
+        }
     }
+
 
     /**
      * Download a plugin, all of its transitive dependencies and dependencies declared on the plugin declaration.
@@ -280,6 +306,12 @@ public class DependencyDownloader {
 
     private void handleRepositoryException(RepositoryException e) {
         log.error(e.getMessage());
+        log.debug(e);
+        addToErrorList(e);
+    }
+
+    private void handleAdditionalArtifactException(ArtifactResolutionException e, String classifier) {
+        log.warn("Could not download " + classifier + "\n" + e.getMessage());
         log.debug(e);
         addToErrorList(e);
     }

@@ -36,11 +36,17 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
     @Parameter(defaultValue = "false", property = "downloadSources")
     private boolean downloadSources;
 
+    @Parameter(defaultValue = "false", property = "downloadJavadoc")
+    private boolean downloadJavadoc;
+
 
     public void execute() {
         dependencyDownloader.init(getBuildingRequest(), getReactorProjects(), getLog());
         if (downloadSources) {
             dependencyDownloader.enableDownloadSources();
+        }
+        if (downloadJavadoc) {
+            dependencyDownloader.enableDownloadJavadoc();
         }
 
         Set<Plugin> allPlugins = new HashSet<>();
