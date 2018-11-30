@@ -76,8 +76,8 @@ Each dynamic dependency block consists of four parameters:
 Note that Plugins are not consistent about where they pull their dynamic dependencies from. Some use the Plugin-Repository
 , some the Main-Repository. If one doesn't work, try the other.
 
-### Downloading Sources
-The plugin can also download the source files of the project's transitive dependencies. This behaviour can either be activated via the pom.xml
+### Downloading Sources and Javadoc
+The plugin can also download the source files and/or javadoc of the project's transitive dependencies. This behaviour can either be activated via the pom.xml
 or a command line parameter.
 
     <plugin>
@@ -86,12 +86,13 @@ or a command line parameter.
         <version>1.0.0</version>
         <configuration>
            <downloadSources>true</downloadSources>
+           <downloadJavadoc>true</downloadJavadoc>
         </configuration>
     </plugin>          
     
 or
 
-    mvn de.qaware.maven:go-offline-maven-plugin:resolve-dependencies -DdownloadSources
+    mvn de.qaware.maven:go-offline-maven-plugin:resolve-dependencies -DdownloadSources -DdownloadJavadoc
     
 ### Usage in CI environments
 The Go Offline Maven Plugin can be used to build a clean repository for build server environments. The resulting repository includes exactly the dependencies and
