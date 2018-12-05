@@ -25,6 +25,8 @@ The Go Offline Maven Plugin fixes these drawbacks.
 - Java 1.7 or higher
 - Maven 3.1.x or higher
 
+**Warning:** Maven 3.5.2 has a Bug that causes the Plugin to hang. If you expirience hangups during downloading dependencies, please upgrade to Maven 3.4.3 or higher (See [MNG-6323](https://issues.apache.org/jira/browse/MNG-6323) )
+
 ## Goals
 The Go Offline Maven Plugin only has one goal: "resolve-dependencies". This goal downloads
 all external dependencies and plugins needed for your build to your local repository.
