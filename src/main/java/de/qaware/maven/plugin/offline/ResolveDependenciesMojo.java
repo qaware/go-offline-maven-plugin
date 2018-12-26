@@ -1,6 +1,7 @@
 package de.qaware.maven.plugin.offline;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,8 +40,10 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
     @Parameter(defaultValue = "false", property = "downloadJavadoc")
     private boolean downloadJavadoc;
 
+    @Parameter(defaultValue = "false", property = "failOnErrors")
+    private boolean failOnErrors;
 
-    public void execute() {
+    public void execute() throws MojoExecutionException {
         dependencyDownloader.init(getBuildingRequest(), getReactorProjects(), getLog());
         if (downloadSources) {
             dependencyDownloader.enableDownloadSources();
@@ -68,8 +71,13 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
         }
         waitForTasksToComplete();
 
-        for (RepositoryException error : dependencyDownloader.getErrors()) {
+        List<RepositoryException> errors = dependencyDownloader.getErrors();
+        for (RepositoryException error : errors) {
             getLog().warn(error.getMessage());
+        }
+
+        if (failOnErrors && !errors.isEmpty()) {
+            throw new MojoExecutionException("Unable to download dependencies, consult the errors and warnings printed above.");
         }
     }
 
