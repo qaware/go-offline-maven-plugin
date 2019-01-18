@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/qaware/go-offline-maven-plugin.svg?branch=master)](https://travis-ci.org/qaware/go-offline-maven-plugin)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=de.qaware.maven%3Ago-offline-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.qaware.maven%3Ago-offline-maven-plugin)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser)
 
 Maven Plugin used to download all Dependencies and Plugins required in a Maven build,
 so the build can be run without an internet connection afterwards.
@@ -40,7 +41,7 @@ Make sure to configure any dynamic dependency your project has (see below).
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <configuration>
             <dynamicDependencies>
                 <DynamicDependency>
