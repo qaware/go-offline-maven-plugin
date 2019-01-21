@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/qaware/go-offline-maven-plugin.svg?branch=master)](https://travis-ci.org/qaware/go-offline-maven-plugin)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=de.qaware.maven%3Ago-offline-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.qaware.maven%3Ago-offline-maven-plugin)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser)
 
 Maven Plugin used to download all Dependencies and Plugins required in a Maven build,
 so the build can be run without an internet connection afterwards.
@@ -25,7 +26,7 @@ The Go Offline Maven Plugin fixes these drawbacks.
 - Java 1.7 or higher
 - Maven 3.1.x or higher
 
-**Warning:** Maven 3.5.2 has a Bug that causes the Plugin to hang. If you expirience hangups during downloading dependencies, please upgrade to Maven 3.4.3 or higher (See [MNG-6323](https://issues.apache.org/jira/browse/MNG-6323) )
+**Warning:** Maven 3.5.2 has a Bug that causes the Plugin to hang. If you expirience hangups during downloading dependencies, please upgrade to Maven 3.5.3 or higher (See [MNG-6323](https://issues.apache.org/jira/browse/MNG-6323) )
 
 ## Goals
 The Go Offline Maven Plugin only has one goal: "resolve-dependencies". This goal downloads
@@ -40,7 +41,7 @@ Make sure to configure any dynamic dependency your project has (see below).
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <configuration>
             <dynamicDependencies>
                 <DynamicDependency>
@@ -85,7 +86,7 @@ or a command line parameter.
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <configuration>
            <downloadSources>true</downloadSources>
            <downloadJavadoc>true</downloadJavadoc>
@@ -108,7 +109,7 @@ For gitlab, add the following build step to the front of your pipeline:
       image: maven:3-jdk-8
       stage: prepare
       script:
-        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.0.0:resolve-dependencies -Dmaven.repo.local=.m2/repository'
+        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.1.0:resolve-dependencies -Dmaven.repo.local=.m2/repository'
       cache:
         key: M2_REPO
         paths:
