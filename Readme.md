@@ -14,7 +14,7 @@ The plugin can also be used to download all source files of all transitive depen
 of a project.
 
 Maven already has an official way to do all this: the maven-dependency-plugin go-offline goal;  
-Unfortunately, the go-offline plugin suffers from several drawbacks:
+Unfortunately, the go-offline goal suffers from several drawbacks:
 
 - Multi-Module builds are not supported since the plugin tries to download reactor-dependencies from the remote repository
 - Most parameters simply do not work
