@@ -19,24 +19,28 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.DependencyResolutionException;
-import org.eclipse.aether.resolution.DependencyResult;
-import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Downloads artifacts for project dependencies and plugins. This class maintains two separate sessions with separate caches
@@ -74,7 +78,6 @@ public class DependencyDownloader {
     private List<RemoteRepository> pluginRepositories;
     private ArtifactTypeRegistry typeRegistry;
     private Log log;
-    private ExclusionsDependencyFilter exclusionsDependencyFilter;
     private List<RepositoryException> errors;
 
     private boolean downloadSources = false;
@@ -104,9 +107,8 @@ public class DependencyDownloader {
             log.warn("Could not initialize wagonExcluder, might not be able to download plugin dependencies correctly", e);
         }
 
-        List<String> exclusions = getExclusions(reactorProjects);
-        exclusionsDependencyFilter = new ExclusionsDependencyFilter(exclusions);
-        DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector());
+        List<Exclusion> exclusions = getExclusions(reactorProjects);
+        DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), new ExclusionDependencySelector(exclusions));
         remoteSession.setDependencySelector(selector);
         remoteSession.setIgnoreArtifactDescriptorRepositories(true);
 
@@ -114,7 +116,7 @@ public class DependencyDownloader {
         remoteSession.setCache(new DefaultRepositoryCache());
         pluginSession.setCache(new DefaultRepositoryCache());
         if (wagonExcluder != null) {
-            pluginSession.setDependencySelector(new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), wagonExcluder));
+            pluginSession.setDependencySelector(new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), wagonExcluder, new ExclusionDependencySelector(exclusions)));
         }
         this.errors = new ArrayList<>();
     }
@@ -129,6 +131,45 @@ public class DependencyDownloader {
     }
 
 
+    public void downloadArtifacts(Collection<ArtifactWithRepoType> artifacts) {
+        List<ArtifactRequest> mainRequests = new ArrayList<>(artifacts.size());
+        List<ArtifactRequest> pluginRequests = new ArrayList<>(artifacts.size());
+        for (ArtifactWithRepoType artifactWithRepoType : artifacts) {
+            Artifact artifact = artifactWithRepoType.getArtifact();
+            RepositoryType context = artifactWithRepoType.getRepositoryType();
+
+            ArtifactRequest artifactRequest = new ArtifactRequest();
+            artifactRequest.setArtifact(artifact);
+            artifactRequest.setRepositories(context == RepositoryType.MAIN ? remoteRepositories : pluginRepositories);
+            if (context == RepositoryType.MAIN) {
+                artifactRequest.setRequestContext(context.getRequestContext());
+                mainRequests.add(artifactRequest);
+
+            } else {
+                artifactRequest.setRequestContext(context.getRequestContext());
+                pluginRequests.add(artifactRequest);
+            }
+            if (context == RepositoryType.MAIN && "jar".equals(artifact.getExtension())) {
+                if (downloadSources) {
+                    Artifact sourceArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "sources", artifact.getExtension(), artifact.getVersion());
+                    mainRequests.add(new ArtifactRequest(sourceArtifact, remoteRepositories, context.getRequestContext()));
+                }
+                if (downloadJavadoc) {
+                    Artifact javadocArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "javadoc", artifact.getExtension(), artifact.getVersion());
+                    mainRequests.add(new ArtifactRequest(javadocArtifact, remoteRepositories, context.getRequestContext()));
+                }
+            }
+        }
+        try {
+            repositorySystem.resolveArtifacts(remoteSession, mainRequests);
+            repositorySystem.resolveArtifacts(pluginSession, pluginRequests);
+        } catch (ArtifactResolutionException e) {
+            log.error("Error downloading dependencies for project");
+            handleRepositoryException(e);
+        }
+    }
+
+
     /**
      * Download all dependencies of a maven project including transitive dependencies.
      * Dependencies that refer to an artifact in the current reactor build are ignored.
@@ -137,12 +178,12 @@ public class DependencyDownloader {
      *
      * @param project the project to download the dependencies for.
      */
-    public void resolveDependencies(MavenProject project) {
+    public Set<ArtifactWithRepoType> resolveDependencies(MavenProject project) {
         Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRepositories(remoteRepositories);
         collectRequest.setRootArtifact(projectArtifact);
-        collectRequest.setRequestContext("project");
+        collectRequest.setRequestContext(RepositoryType.MAIN.getRequestContext());
 
 
         List<Dependency> aetherDependencies = new ArrayList<>();
@@ -163,51 +204,26 @@ public class DependencyDownloader {
         }
         collectRequest.setManagedDependencies(aetherDepManagement);
 
-
-        DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, exclusionsDependencyFilter);
         try {
-            DependencyResult dependencyResult = repositorySystem.resolveDependencies(remoteSession, dependencyRequest);
-            downloadSources(dependencyResult);
-            downloadJavadoc(dependencyResult);
+            CollectResult collectResult = repositorySystem.collectDependencies(remoteSession, collectRequest);
+            return getArtifactsFromCollectResult(collectResult, RepositoryType.MAIN);
         } catch (RepositoryException e) {
             log.error("Error resolving dependencies for project " + project.getGroupId() + ":" + project.getArtifactId());
             handleRepositoryException(e);
         }
+        return Collections.emptySet();
     }
 
-    private void downloadSources(DependencyResult dependencyResult) {
-        if (!downloadSources) {
-            return;
+    private Set<ArtifactWithRepoType> getArtifactsFromCollectResult(CollectResult collectResult, RepositoryType context) {
+        CollectAllDependenciesVisitor visitor = new CollectAllDependenciesVisitor();
+        collectResult.getRoot().accept(visitor);
+        Set<Artifact> visitorArtifacts = visitor.getArtifacts();
+        Set<ArtifactWithRepoType> artifacts = new HashSet<>();
+        for (Artifact visitorArtifact : visitorArtifacts) {
+            artifacts.add(new ArtifactWithRepoType(visitorArtifact, context));
         }
-
-        downloadAdditionalArtifact(dependencyResult, "sources");
-
+        return artifacts;
     }
-
-    private void downloadJavadoc(DependencyResult dependencyResult) {
-        if (!downloadJavadoc) {
-            return;
-        }
-        downloadAdditionalArtifact(dependencyResult, "javadoc");
-    }
-
-    private void downloadAdditionalArtifact(DependencyResult dependencyResult, String classifier) {
-        ArrayList<ArtifactRequest> requests = new ArrayList<>();
-        for (ArtifactResult artifactResult : dependencyResult.getArtifactResults()) {
-            Artifact artifact = artifactResult.getArtifact();
-            if (!artifact.getExtension().equals("jar")) {
-                continue;
-            }
-            DefaultArtifact sourceArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), classifier, artifact.getExtension(), artifact.getVersion());
-            requests.add(new ArtifactRequest(sourceArtifact, remoteRepositories, "project"));
-        }
-        try {
-            repositorySystem.resolveArtifacts(remoteSession, requests);
-        } catch (ArtifactResolutionException e) {
-            handleAdditionalArtifactException(e, classifier);
-        }
-    }
-
 
     /**
      * Download a plugin, all of its transitive dependencies and dependencies declared on the plugin declaration.
@@ -218,11 +234,11 @@ public class DependencyDownloader {
      *
      * @param plugin the plugin to download
      */
-    public void resolvePlugin(Plugin plugin) {
+    public Set<ArtifactWithRepoType> resolvePlugin(Plugin plugin) {
         Artifact pluginArtifact = toArtifact(plugin);
         Dependency pluginDependency = new Dependency(pluginArtifact, null);
         CollectRequest collectRequest = new CollectRequest(pluginDependency, pluginRepositories);
-        collectRequest.setRequestContext("plugin");
+        collectRequest.setRequestContext(RepositoryType.PLUGIN.getRequestContext());
 
         List<Dependency> pluginDependencies = new ArrayList<>();
         for (org.apache.maven.model.Dependency d : plugin.getDependencies()) {
@@ -231,14 +247,14 @@ public class DependencyDownloader {
         }
         collectRequest.setDependencies(pluginDependencies);
 
-        DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, exclusionsDependencyFilter);
-
         try {
-            repositorySystem.resolveDependencies(pluginSession, dependencyRequest);
-        } catch (DependencyResolutionException e) {
+            CollectResult collectResult = repositorySystem.collectDependencies(pluginSession, collectRequest);
+            return getArtifactsFromCollectResult(collectResult, RepositoryType.PLUGIN);
+        } catch (DependencyCollectionException e) {
             log.error("Error resolving plugin " + plugin.getGroupId() + ":" + plugin.getArtifactId());
             handleRepositoryException(e);
         }
+        return Collections.emptySet();
     }
 
     /**
@@ -250,7 +266,7 @@ public class DependencyDownloader {
      *
      * @param dynamicDependency the dependency to download
      */
-    public void resolveDynamicDependency(DynamicDependency dynamicDependency) {
+    public Set<ArtifactWithRepoType> resolveDynamicDependency(DynamicDependency dynamicDependency) {
         DefaultArtifact artifact = new DefaultArtifact(dynamicDependency.getGroupId(), dynamicDependency.getArtifactId(), "jar", dynamicDependency.getVersion());
 
         CollectRequest collectRequest = new CollectRequest();
@@ -261,24 +277,25 @@ public class DependencyDownloader {
             case MAIN:
                 session = remoteSession;
                 collectRequest.setRepositories(remoteRepositories);
-                collectRequest.setRequestContext("dynamic-main");
+                collectRequest.setRequestContext(repositoryType.getRequestContext());
                 break;
             case PLUGIN:
                 session = pluginSession;
                 collectRequest.setRepositories(pluginRepositories);
-                collectRequest.setRequestContext("dynamic-plugin");
+                collectRequest.setRequestContext(repositoryType.getRequestContext());
                 break;
             default:
                 throw new IllegalStateException("Unknown enum val " + repositoryType);
 
         }
-        DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, exclusionsDependencyFilter);
         try {
-            repositorySystem.resolveDependencies(session, dependencyRequest);
-        } catch (DependencyResolutionException e) {
+            CollectResult collectResult = repositorySystem.collectDependencies(session, collectRequest);
+            return getArtifactsFromCollectResult(collectResult, repositoryType);
+        } catch (DependencyCollectionException e) {
             log.error("Error resolving dynamic dependency" + dynamicDependency.getGroupId() + ":" + dynamicDependency.getArtifactId());
             handleRepositoryException(e);
         }
+        return Collections.emptySet();
     }
 
     /**
@@ -294,11 +311,11 @@ public class DependencyDownloader {
      * @param projects the list of projects to build build the exclusion strings for
      * @return List of strings containing an exclusion string for each given project
      */
-    private List<String> getExclusions(List<MavenProject> projects) {
-        List<String> list = new ArrayList<>();
+    private List<Exclusion> getExclusions(List<MavenProject> projects) {
+        List<Exclusion> list = new ArrayList<>();
         for (MavenProject p : projects) {
-            String s = p.getGroupId() + ":" + p.getArtifactId();
-            list.add(s);
+            Exclusion exclusion = new Exclusion(p.getGroupId(), p.getArtifactId(), "*", "*");
+            list.add(exclusion);
         }
         return list;
     }
@@ -306,12 +323,6 @@ public class DependencyDownloader {
 
     private void handleRepositoryException(RepositoryException e) {
         log.error(e.getMessage());
-        log.debug(e);
-        addToErrorList(e);
-    }
-
-    private void handleAdditionalArtifactException(ArtifactResolutionException e, String classifier) {
-        log.warn("Could not download " + classifier + "\n" + e.getMessage());
         log.debug(e);
         addToErrorList(e);
     }
@@ -324,5 +335,29 @@ public class DependencyDownloader {
         ArtifactType artifactType = typeRegistry.get(MAVEN_PLUGIN_ARTIFACT_TYPE);
         return new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), artifactType.getClassifier(), artifactType.getExtension(), plugin.getVersion(),
                 artifactType);
+    }
+
+    private static class CollectAllDependenciesVisitor implements DependencyVisitor {
+
+        private boolean root = true;
+        private Set<Artifact> artifacts = new HashSet<>();
+
+        @Override
+        public boolean visitEnter(DependencyNode node) {
+            if (root) {
+                root = false;
+                return true;
+            }
+            return artifacts.add(node.getArtifact());
+        }
+
+        @Override
+        public boolean visitLeave(DependencyNode node) {
+            return true;
+        }
+
+        public Set<Artifact> getArtifacts() {
+            return artifacts;
+        }
     }
 }

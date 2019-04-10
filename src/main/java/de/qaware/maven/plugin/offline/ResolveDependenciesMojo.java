@@ -58,18 +58,23 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
             allPlugins.addAll(buildPlugins);
         }
 
+        Set<ArtifactWithRepoType> artifactsToDownload = new HashSet<>();
+
+
         for (Plugin plugin : allPlugins) {
-            scheduleTask(new ResolvePluginJob(plugin));
+            artifactsToDownload.addAll(dependencyDownloader.resolvePlugin(plugin));
         }
         for (MavenProject project : getReactorProjects()) {
-            scheduleTask(new ResolveProjectDependenciesJob(project));
+            artifactsToDownload.addAll(dependencyDownloader.resolveDependencies(project));
         }
         if (dynamicDependencies != null) {
             for (DynamicDependency dep : dynamicDependencies) {
-                scheduleTask(new ResolveDynamicDependenciesJob(dep));
+                artifactsToDownload.addAll(dependencyDownloader.resolveDynamicDependency(dep));
             }
         }
-        waitForTasksToComplete();
+
+        dependencyDownloader.downloadArtifacts(artifactsToDownload);
+
 
         List<RepositoryException> errors = dependencyDownloader.getErrors();
         for (RepositoryException error : errors) {
@@ -81,42 +86,4 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
         }
     }
 
-    private class ResolvePluginJob implements Runnable {
-        private final Plugin plugin;
-
-        public ResolvePluginJob(Plugin plugin) {
-            this.plugin = plugin;
-        }
-
-        @Override
-        public void run() {
-            dependencyDownloader.resolvePlugin(plugin);
-        }
-    }
-
-    private class ResolveProjectDependenciesJob implements Runnable {
-        private final MavenProject project;
-
-        public ResolveProjectDependenciesJob(MavenProject project) {
-            this.project = project;
-        }
-
-        @Override
-        public void run() {
-            dependencyDownloader.resolveDependencies(project);
-        }
-    }
-
-    private class ResolveDynamicDependenciesJob implements Runnable {
-        private final DynamicDependency dep;
-
-        public ResolveDynamicDependenciesJob(DynamicDependency dep) {
-            this.dep = dep;
-        }
-
-        @Override
-        public void run() {
-            dependencyDownloader.resolveDynamicDependency(dep);
-        }
-    }
 }

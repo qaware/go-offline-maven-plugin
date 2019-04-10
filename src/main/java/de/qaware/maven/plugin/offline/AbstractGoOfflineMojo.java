@@ -10,8 +10,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Base class for mojos in the in the go-offline maven plugin.
@@ -51,29 +49,6 @@ public abstract class AbstractGoOfflineMojo extends AbstractMojo {
 
     private ProjectBuildingRequest buildingRequest;
 
-    private final ForkJoinPool pool = new ForkJoinPool(4);
-
-
-    /**
-     * Schedule a task to be run asynchronously.
-     * <p>
-     * Scheduled Tasks are only guaranteed to run if {@link #waitForTasksToComplete()}
-     * is called after scheduling all tasks
-     *
-     * @param runnable the task to schedule
-     */
-    protected void scheduleTask(Runnable runnable) {
-        pool.execute(runnable);
-    }
-
-
-    /**
-     * Blocks the thread until all tasks scheduled with {@link #scheduleTask(Runnable)} have been completed
-     * or one hour has passed without completing all tasks.
-     */
-    protected void waitForTasksToComplete() {
-        pool.awaitQuiescence(1L, TimeUnit.HOURS);
-    }
 
     /**
      * @return a building request initialized with the data of the current maven session

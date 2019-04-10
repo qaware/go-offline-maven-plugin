@@ -9,9 +9,20 @@ public enum RepositoryType {
     /**
      * RemoteRepository used for downloading project dependencies
      */
-    MAIN,
+    MAIN("project"),
     /**
      * RemoteRepository used for downloading plugins and their dependencies.
      */
-    PLUGIN
+    PLUGIN("plugin");
+
+
+    private final String requestContext;
+
+    RepositoryType(String requestContext) {
+        this.requestContext = requestContext;
+    }
+
+    public String getRequestContext() {
+        return requestContext;
+    }
 }
