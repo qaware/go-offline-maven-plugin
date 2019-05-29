@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- added ability to fail on errors
+- rewrote how dependencies are downloaded. Should fix concurrency issues with broken downloads. 
+
 ##1.1.0
 
 - [#4](https://github.com/qaware/go-offline-maven-plugin/issues/4) Added downloadJavadoc feature
