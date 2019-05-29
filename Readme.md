@@ -41,7 +41,7 @@ Make sure to configure any dynamic dependency your project has (see below).
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <configuration>
             <dynamicDependencies>
                 <DynamicDependency>
@@ -86,7 +86,7 @@ or a command line parameter.
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <configuration>
            <downloadSources>true</downloadSources>
            <downloadJavadoc>true</downloadJavadoc>
@@ -109,7 +109,7 @@ For gitlab, add the following build step to the front of your pipeline:
       image: maven:3-jdk-8
       stage: prepare
       script:
-        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.1.0:resolve-dependencies -Dmaven.repo.local=.m2/repository'
+        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.2.0:resolve-dependencies -Dmaven.repo.local=.m2/repository'
       cache:
         key: M2_REPO
         paths:
