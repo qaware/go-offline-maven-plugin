@@ -82,6 +82,7 @@ public class DependencyDownloader {
 
     private boolean downloadSources = false;
     private boolean downloadJavadoc = false;
+    private Set<Artifact> reactorArtifacts;
 
     /**
      * Initialize the DependencyDownloader
@@ -107,6 +108,7 @@ public class DependencyDownloader {
             log.warn("Could not initialize wagonExcluder, might not be able to download plugin dependencies correctly", e);
         }
 
+        reactorArtifacts = computeReactorArtifacts(reactorProjects);
         List<Exclusion> exclusions = getExclusions(reactorProjects);
         DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), new ExclusionDependencySelector(exclusions));
         remoteSession.setDependencySelector(selector);
@@ -222,6 +224,10 @@ public class DependencyDownloader {
         for (Artifact visitorArtifact : visitorArtifacts) {
             artifacts.add(new ArtifactWithRepoType(visitorArtifact, context));
         }
+        Artifact rootArtifact = collectResult.getRoot().getArtifact();
+        if (!isReactorArtifact(rootArtifact)) {
+            artifacts.add(new ArtifactWithRepoType(rootArtifact, context));
+        }
         return artifacts;
     }
 
@@ -320,6 +326,17 @@ public class DependencyDownloader {
         return list;
     }
 
+    private Set<Artifact> computeReactorArtifacts(List<MavenProject> reactorProjects) {
+        Set<Artifact> artifacts = new HashSet<>(reactorProjects.size());
+        for (MavenProject p : reactorProjects) {
+            artifacts.add(toArtifact(p.getArtifact()));
+        }
+        return artifacts;
+    }
+
+    private boolean isReactorArtifact(Artifact artifact) {
+        return reactorArtifacts.contains(artifact);
+    }
 
     private void handleRepositoryException(RepositoryException e) {
         log.error(e.getMessage());
@@ -329,6 +346,12 @@ public class DependencyDownloader {
 
     private synchronized void addToErrorList(RepositoryException e) {
         errors.add(e);
+    }
+
+    private Artifact toArtifact(org.apache.maven.artifact.Artifact mavenArtifact) {
+        ArtifactType artifactType = typeRegistry.get(mavenArtifact.getType());
+        return new DefaultArtifact(mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(), artifactType.getClassifier(), artifactType.getExtension(), mavenArtifact.getVersion(),
+                artifactType);
     }
 
     private Artifact toArtifact(Plugin plugin) {
