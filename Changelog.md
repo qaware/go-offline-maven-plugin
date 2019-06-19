@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+- [#10](https://github.com/qaware/go-offline-maven-plugin/issues/10) Fixed regression in 1.2.0: Only transitive dependencies of plugins and dynamicDependencies where downloaded,
+not the artifact itself.
+
 ## 1.2.0
 
 - added ability to fail on errors
