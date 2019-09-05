@@ -71,7 +71,7 @@ cannot know that it has to download those dependencies. Most prominently, the su
 loads test-providers based on the tests it finds in the project.
 
 You must tell the Go Offline Maven Plugin of those dynamic depenencies to ensure all dependencies are downloaded.
-For each dependency, add a DynamicDependency block to the plugin's configuration as seen in the [Usage](#usage-in-ci-environments) section.
+For each dependency, add a DynamicDependency block to the plugin's configuration as seen in the [Usage](#usage) section.
 Each dynamic dependency block consists of four parameters:
 
 - *groupId* The GroupId of the dynamic dependency to download
