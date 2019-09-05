@@ -6,7 +6,6 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositoryException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -76,8 +75,8 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
         dependencyDownloader.downloadArtifacts(artifactsToDownload);
 
 
-        List<RepositoryException> errors = dependencyDownloader.getErrors();
-        for (RepositoryException error : errors) {
+        List<Exception> errors = dependencyDownloader.getErrors();
+        for (Exception error : errors) {
             getLog().warn(error.getMessage());
         }
 

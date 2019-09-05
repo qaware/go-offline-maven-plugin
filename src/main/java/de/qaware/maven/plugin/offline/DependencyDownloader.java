@@ -78,7 +78,7 @@ public class DependencyDownloader {
     private List<RemoteRepository> pluginRepositories;
     private ArtifactTypeRegistry typeRegistry;
     private Log log;
-    private List<RepositoryException> errors;
+    private List<Exception> errors;
 
     private boolean downloadSources = false;
     private boolean downloadJavadoc = false;
@@ -165,7 +165,7 @@ public class DependencyDownloader {
         try {
             repositorySystem.resolveArtifacts(remoteSession, mainRequests);
             repositorySystem.resolveArtifacts(pluginSession, pluginRequests);
-        } catch (ArtifactResolutionException e) {
+        } catch (ArtifactResolutionException | RuntimeException e) {
             log.error("Error downloading dependencies for project");
             handleRepositoryException(e);
         }
@@ -209,7 +209,7 @@ public class DependencyDownloader {
         try {
             CollectResult collectResult = repositorySystem.collectDependencies(remoteSession, collectRequest);
             return getArtifactsFromCollectResult(collectResult, RepositoryType.MAIN);
-        } catch (RepositoryException e) {
+        } catch (RepositoryException | RuntimeException e) {
             log.error("Error resolving dependencies for project " + project.getGroupId() + ":" + project.getArtifactId());
             handleRepositoryException(e);
         }
@@ -256,7 +256,7 @@ public class DependencyDownloader {
         try {
             CollectResult collectResult = repositorySystem.collectDependencies(pluginSession, collectRequest);
             return getArtifactsFromCollectResult(collectResult, RepositoryType.PLUGIN);
-        } catch (DependencyCollectionException e) {
+        } catch (DependencyCollectionException | RuntimeException e) {
             log.error("Error resolving plugin " + plugin.getGroupId() + ":" + plugin.getArtifactId());
             handleRepositoryException(e);
         }
@@ -297,7 +297,7 @@ public class DependencyDownloader {
         try {
             CollectResult collectResult = repositorySystem.collectDependencies(session, collectRequest);
             return getArtifactsFromCollectResult(collectResult, repositoryType);
-        } catch (DependencyCollectionException e) {
+        } catch (DependencyCollectionException | RuntimeException e) {
             log.error("Error resolving dynamic dependency" + dynamicDependency.getGroupId() + ":" + dynamicDependency.getArtifactId());
             handleRepositoryException(e);
         }
@@ -307,7 +307,7 @@ public class DependencyDownloader {
     /**
      * @return a List of errors encountered during the downloading of artifacts since this class has been initialized.
      */
-    public List<RepositoryException> getErrors() {
+    public List<Exception> getErrors() {
         return Collections.unmodifiableList(errors);
     }
 
@@ -338,13 +338,13 @@ public class DependencyDownloader {
         return reactorArtifacts.contains(artifact);
     }
 
-    private void handleRepositoryException(RepositoryException e) {
+    private void handleRepositoryException(Exception e) {
         log.error(e.getMessage());
         log.debug(e);
         addToErrorList(e);
     }
 
-    private synchronized void addToErrorList(RepositoryException e) {
+    private synchronized void addToErrorList(Exception e) {
         errors.add(e);
     }
 
