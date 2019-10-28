@@ -25,12 +25,10 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
-import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
-import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 
@@ -109,8 +107,7 @@ public class DependencyDownloader {
         }
 
         reactorArtifacts = computeReactorArtifacts(reactorProjects);
-        List<Exclusion> exclusions = getExclusions(reactorProjects);
-        DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), new ExclusionDependencySelector(exclusions));
+        DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector());
         remoteSession.setDependencySelector(selector);
         remoteSession.setIgnoreArtifactDescriptorRepositories(true);
 
@@ -118,7 +115,7 @@ public class DependencyDownloader {
         remoteSession.setCache(new DefaultRepositoryCache());
         pluginSession.setCache(new DefaultRepositoryCache());
         if (wagonExcluder != null) {
-            pluginSession.setDependencySelector(new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), wagonExcluder, new ExclusionDependencySelector(exclusions)));
+            pluginSession.setDependencySelector(new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), wagonExcluder));
         }
         this.errors = new ArrayList<>();
     }
@@ -222,7 +219,9 @@ public class DependencyDownloader {
         Set<Artifact> visitorArtifacts = visitor.getArtifacts();
         Set<ArtifactWithRepoType> artifacts = new HashSet<>();
         for (Artifact visitorArtifact : visitorArtifacts) {
-            artifacts.add(new ArtifactWithRepoType(visitorArtifact, context));
+            if (!isReactorArtifact(visitorArtifact)) {
+                artifacts.add(new ArtifactWithRepoType(visitorArtifact, context));
+            }
         }
         Artifact rootArtifact = collectResult.getRoot().getArtifact();
         if (!isReactorArtifact(rootArtifact)) {
@@ -309,21 +308,6 @@ public class DependencyDownloader {
      */
     public List<Exception> getErrors() {
         return Collections.unmodifiableList(errors);
-    }
-
-    /**
-     * Build a list of exclusion strings in the format {@code <groupId>:<artifactId>} for a list of projects.
-     *
-     * @param projects the list of projects to build build the exclusion strings for
-     * @return List of strings containing an exclusion string for each given project
-     */
-    private List<Exclusion> getExclusions(List<MavenProject> projects) {
-        List<Exclusion> list = new ArrayList<>();
-        for (MavenProject p : projects) {
-            Exclusion exclusion = new Exclusion(p.getGroupId(), p.getArtifactId(), "*", "*");
-            list.add(exclusion);
-        }
-        return list;
     }
 
     private Set<Artifact> computeReactorArtifacts(List<MavenProject> reactorProjects) {
