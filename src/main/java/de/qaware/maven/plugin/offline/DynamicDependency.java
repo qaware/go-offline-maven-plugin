@@ -14,6 +14,7 @@ public class DynamicDependency {
     private String artifactId;
     private String groupId;
     private String version;
+    private String classifier;
     private RepositoryType repositoryType;
 
     /**
@@ -47,6 +48,17 @@ public class DynamicDependency {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    /**
+     * @return The classifier of the {@link DynamicDependency}. May be null.
+     */
+    public String getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
     }
 
     /**

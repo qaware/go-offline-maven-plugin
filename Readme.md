@@ -53,6 +53,13 @@ Make sure to configure any dynamic dependency your project has (see below).
                     <version>2.20.1</version>
                     <repositoryType>PLUGIN</repositoryType>
                 </DynamicDependency>
+                <DynamicDependency>
+                    <groupId>com.querydsl</groupId>
+                    <artifactId>querydsl-apt</artifactId>
+                    <version>4.2.1</version>
+                    <classifier>jpa</classifier>
+                    <repositoryType>MAIN</repositoryType>
+                </DynamicDependency>
             </dynamicDependencies>
         </configuration>
     </plugin>
@@ -72,11 +79,12 @@ loads test-providers based on the tests it finds in the project.
 
 You must tell the Go Offline Maven Plugin of those dynamic depenencies to ensure all dependencies are downloaded.
 For each dependency, add a DynamicDependency block to the plugin's configuration as seen in the [Usage](#usage) section.
-Each dynamic dependency block consists of four parameters:
+Each dynamic dependency block consists of the following parameters:
 
 - *groupId* The GroupId of the dynamic dependency to download
 - *artifactId* The ArtifactId of the dynamic dependency to download
 - *version* The version of the dynamic dependency to download
+- *classifier* (optional) The classifier of the dynamic dependency to download
 - *repositoryType* Either 'MAIN' or 'PLUGIN' to control from which repository the dependency is downloaded
 
 Note that Plugins are not consistent about where they pull their dynamic dependencies from. Some use the Plugin-Repository
