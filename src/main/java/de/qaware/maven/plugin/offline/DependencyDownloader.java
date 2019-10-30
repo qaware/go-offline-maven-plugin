@@ -272,7 +272,7 @@ public class DependencyDownloader {
      * @param dynamicDependency the dependency to download
      */
     public Set<ArtifactWithRepoType> resolveDynamicDependency(DynamicDependency dynamicDependency) {
-        DefaultArtifact artifact = new DefaultArtifact(dynamicDependency.getGroupId(), dynamicDependency.getArtifactId(), "jar", dynamicDependency.getVersion());
+        DefaultArtifact artifact = new DefaultArtifact(dynamicDependency.getGroupId(), dynamicDependency.getArtifactId(), dynamicDependency.getClassifier(), "jar", dynamicDependency.getVersion());
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(artifact, null));
