@@ -29,6 +29,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 
@@ -107,7 +108,7 @@ public class DependencyDownloader {
         }
 
         reactorArtifacts = computeReactorArtifacts(reactorProjects);
-        DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector());
+        DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), new ExclusionDependencySelector());
         remoteSession.setDependencySelector(selector);
         remoteSession.setIgnoreArtifactDescriptorRepositories(true);
 
@@ -115,7 +116,7 @@ public class DependencyDownloader {
         remoteSession.setCache(new DefaultRepositoryCache());
         pluginSession.setCache(new DefaultRepositoryCache());
         if (wagonExcluder != null) {
-            pluginSession.setDependencySelector(new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), wagonExcluder));
+            pluginSession.setDependencySelector(new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), wagonExcluder, new ExclusionDependencySelector()));
         }
         this.errors = new ArrayList<>();
     }
