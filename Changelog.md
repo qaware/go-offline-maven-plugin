@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3
+
+- [#14](https://github.com/qaware/go-offline-maven-plugin/issues/14) fixed Dependencies not resolving correctly when depending on a reactor artifact and changing one of the transitive dependencies of that artifact via dependency management
+
 ## 1.2.2
 
 - [#15](https://github.com/qaware/go-offline-maven-plugin/issues/15) added support for classifier to DynamicDependency configuration 
