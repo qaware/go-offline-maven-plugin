@@ -81,7 +81,7 @@ public class DependencyDownloader {
 
     private boolean downloadSources = false;
     private boolean downloadJavadoc = false;
-    private Set<Artifact> reactorArtifacts;
+    private Set<ReactorArtifact> reactorArtifacts;
 
     /**
      * Initialize the DependencyDownloader
@@ -311,16 +311,16 @@ public class DependencyDownloader {
         return Collections.unmodifiableList(errors);
     }
 
-    private Set<Artifact> computeReactorArtifacts(List<MavenProject> reactorProjects) {
-        Set<Artifact> artifacts = new HashSet<>(reactorProjects.size());
+    private Set<ReactorArtifact> computeReactorArtifacts(List<MavenProject> reactorProjects) {
+        Set<ReactorArtifact> artifacts = new HashSet<>(reactorProjects.size());
         for (MavenProject p : reactorProjects) {
-            artifacts.add(toArtifact(p.getArtifact()));
+            artifacts.add(new ReactorArtifact(p.getArtifact()));
         }
         return artifacts;
     }
 
     private boolean isReactorArtifact(Artifact artifact) {
-        return reactorArtifacts.contains(artifact);
+        return reactorArtifacts.contains(new ReactorArtifact(artifact));
     }
 
     private void handleRepositoryException(Exception e) {
@@ -331,12 +331,6 @@ public class DependencyDownloader {
 
     private synchronized void addToErrorList(Exception e) {
         errors.add(e);
-    }
-
-    private Artifact toArtifact(org.apache.maven.artifact.Artifact mavenArtifact) {
-        ArtifactType artifactType = typeRegistry.get(mavenArtifact.getType());
-        return new DefaultArtifact(mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(), artifactType.getClassifier(), artifactType.getExtension(), mavenArtifact.getVersion(),
-                artifactType);
     }
 
     private Artifact toArtifact(Plugin plugin) {

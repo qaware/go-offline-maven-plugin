@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4 (in development)
+
+- [#16](https://github.com/qaware/go-offline-maven-plugin/issues/16) fixed attachedArtifacts with different types/extensions than the main artifact not recognized as part of the reactor build. 
+
 ## 1.2.3
 
 - [#14](https://github.com/qaware/go-offline-maven-plugin/issues/14) fixed Dependencies not resolving correctly when depending on a reactor artifact and changing one of the transitive dependencies of that artifact via dependency management
