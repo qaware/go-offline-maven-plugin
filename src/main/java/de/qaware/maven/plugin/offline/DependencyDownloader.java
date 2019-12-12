@@ -110,7 +110,6 @@ public class DependencyDownloader {
         reactorArtifacts = computeReactorArtifacts(reactorProjects);
         DependencySelector selector = new AndDependencySelector(new ScopeDependencySelector("system", "test", "provided"), new OptionalDependencySelector(), new ExclusionDependencySelector());
         remoteSession.setDependencySelector(selector);
-        remoteSession.setIgnoreArtifactDescriptorRepositories(true);
 
         pluginSession = new DefaultRepositorySystemSession(remoteSession);
         remoteSession.setCache(new DefaultRepositoryCache());
