@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.4 (in development)
+## 1.2.4
 
 - [#16](https://github.com/qaware/go-offline-maven-plugin/issues/16) fixed attachedArtifacts with different types/extensions than the main artifact not recognized as part of the reactor build.
 - [#16](https://github.com/qaware/go-offline-maven-plugin/issues/16) fixed: 'IgnoreArtifactDescriptorRepositories' flag was always set to true instead of using maven provided value. This could lead to  unresolvable artifacts if a dependency declared an additional repository.  
