@@ -161,9 +161,14 @@ public class DependencyDownloader {
         }
         try {
             repositorySystem.resolveArtifacts(remoteSession, mainRequests);
-            repositorySystem.resolveArtifacts(pluginSession, pluginRequests);
         } catch (ArtifactResolutionException | RuntimeException e) {
             log.error("Error downloading dependencies for project");
+            handleRepositoryException(e);
+        }
+        try {
+            repositorySystem.resolveArtifacts(pluginSession, pluginRequests);
+        } catch (ArtifactResolutionException | RuntimeException e) {
+            log.error("Error downloading plugin dependencies for project");
             handleRepositoryException(e);
         }
     }

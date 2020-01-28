@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.5
+
+- fixed: Errors when downloading dependencies completely skipped the download of plugins.
+
 ## 1.2.4
 
 - [#16](https://github.com/qaware/go-offline-maven-plugin/issues/16) fixed attachedArtifacts with different types/extensions than the main artifact not recognized as part of the reactor build.
