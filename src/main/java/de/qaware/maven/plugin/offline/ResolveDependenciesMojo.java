@@ -43,6 +43,7 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
     private boolean failOnErrors;
 
     public void execute() throws MojoExecutionException {
+        validateConfiguration();
         dependencyDownloader.init(getBuildingRequest(), getReactorProjects(), getLog());
         if (downloadSources) {
             dependencyDownloader.enableDownloadSources();
@@ -82,6 +83,14 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
 
         if (failOnErrors && !errors.isEmpty()) {
             throw new MojoExecutionException("Unable to download dependencies, consult the errors and warnings printed above.");
+        }
+    }
+
+    private void validateConfiguration() throws MojoExecutionException {
+        if (dynamicDependencies != null) {
+            for (DynamicDependency dynamicDependency : dynamicDependencies) {
+                dynamicDependency.validate();
+            }
         }
     }
 
