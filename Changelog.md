@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.2.5
+## 1.2.6
+
+- [#20](https://github.com/qaware/go-offline-maven-plugin/issues/20) Validate the user provided DynamicDependency configuration and print an error to help the user fix the configuration if it is incorrect.
+
+## 1.2.6
 
 - fixed: Errors when downloading dependencies completely skipped the download of plugins.
 
