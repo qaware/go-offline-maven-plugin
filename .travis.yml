@@ -1,8 +1,0 @@
-language: java
-addons:
-  sonarcloud:
-    organization: "theoderich-github"
-    token:
-      secure: $SONAR_TOKEN
-script:
-- mvn clean install sonar:sonar -Dsonar.projectKey=de.qaware.maven:go-offline-maven-plugin
