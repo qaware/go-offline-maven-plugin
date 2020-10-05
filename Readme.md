@@ -1,6 +1,4 @@
 # Go Offline Maven Plugin
-[![Build Status](https://travis-ci.org/qaware/go-offline-maven-plugin.svg?branch=master)](https://travis-ci.org/qaware/go-offline-maven-plugin)
-[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=de.qaware.maven%3Ago-offline-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.qaware.maven%3Ago-offline-maven-plugin)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.qaware.maven/go-offline-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.qaware.maven/go-offline-maven-plugin)
 
