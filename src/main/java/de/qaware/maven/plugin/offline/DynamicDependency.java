@@ -18,6 +18,7 @@ public class DynamicDependency {
     private String groupId;
     private String version;
     private String classifier;
+    private String type;
     private RepositoryType repositoryType;
 
     /**
@@ -71,6 +72,21 @@ public class DynamicDependency {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    /**
+     * @return The type of the {@link DynamicDependency}.
+     * Either returns the user entered value or "jar" as a default if the user provided no value.
+     */
+    public String getType() {
+        if (type == null || type.isEmpty()) {
+            return "jar";
+        }
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**

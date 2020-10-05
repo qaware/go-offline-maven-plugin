@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.7
+
+- [#22](https://github.com/qaware/go-offline-maven-plugin/issues/22) Added \<type\> attribute to DynamicDependency
+
 ## 1.2.6
 
 - [#20](https://github.com/qaware/go-offline-maven-plugin/issues/20) Validate the user provided DynamicDependency configuration and print an error to help the user fix the configuration if it is incorrect.
