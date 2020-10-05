@@ -5,4 +5,4 @@ addons:
     token:
       secure: $SONAR_TOKEN
 script:
-- mvn clean install sonar:sonar
+- mvn clean install sonar:sonar -Dsonar.projectKey=theoderich-github
