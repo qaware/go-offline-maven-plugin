@@ -42,7 +42,7 @@ Make sure to configure any dynamic dependency your project has (see below).
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.2.6</version>
+        <version>1.2.7</version>
         <configuration>
             <dynamicDependencies>
                 <DynamicDependency>
@@ -56,6 +56,13 @@ Make sure to configure any dynamic dependency your project has (see below).
                     <artifactId>querydsl-apt</artifactId>
                     <version>4.2.1</version>
                     <classifier>jpa</classifier>
+                    <repositoryType>MAIN</repositoryType>
+                </DynamicDependency>
+                <DynamicDependency>
+                    <groupId>org.flywaydb</groupId>
+                    <artifactId>flyway-commandline</artifactId>
+                    <version>4.0.3</version>
+                    <type>zip</type>
                     <repositoryType>MAIN</repositoryType>
                 </DynamicDependency>
             </dynamicDependencies>
@@ -83,6 +90,7 @@ Each dynamic dependency block consists of the following parameters:
 - *artifactId* The ArtifactId of the dynamic dependency to download
 - *version* The version of the dynamic dependency to download
 - *classifier* (optional) The classifier of the dynamic dependency to download
+- *type* (optional) The type of the dynamic dependency to download
 - *repositoryType* Either 'MAIN' or 'PLUGIN' to control from which repository the dependency is downloaded
 
 Note that Plugins are not consistent about where they pull their dynamic dependencies from. Some use the Plugin-Repository
@@ -95,7 +103,7 @@ or a command line parameter.
     <plugin>
         <groupId>de.qaware.maven</groupId>
         <artifactId>go-offline-maven-plugin</artifactId>
-        <version>1.2.6</version>
+        <version>1.2.7</version>
         <configuration>
            <downloadSources>true</downloadSources>
            <downloadJavadoc>true</downloadJavadoc>
@@ -118,7 +126,7 @@ For gitlab, add the following build step to the front of your pipeline:
       image: maven:3-jdk-8
       stage: prepare
       script:
-        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.2.6:resolve-dependencies -Dmaven.repo.local=.m2/repository'
+        - 'mvn de.qaware.maven:go-offline-maven-plugin:1.2.7:resolve-dependencies -Dmaven.repo.local=.m2/repository'
       cache:
         key: M2_REPO
         paths:
