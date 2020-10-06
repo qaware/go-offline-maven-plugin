@@ -277,8 +277,13 @@ public class DependencyDownloader {
      * @param dynamicDependency the dependency to download
      */
     public Set<ArtifactWithRepoType> resolveDynamicDependency(DynamicDependency dynamicDependency) {
-        DefaultArtifact artifact = new DefaultArtifact(dynamicDependency.getGroupId(), dynamicDependency.getArtifactId(), dynamicDependency.getClassifier(), dynamicDependency.getType(), dynamicDependency.getVersion());
-
+        ArtifactType artifactType = typeRegistry.get(dynamicDependency.getType());
+        DefaultArtifact artifact;
+        if (artifactType == null) {
+            artifact = new DefaultArtifact(dynamicDependency.getGroupId(), dynamicDependency.getArtifactId(), dynamicDependency.getClassifier(), dynamicDependency.getType(), dynamicDependency.getVersion());
+        } else {
+            artifact = new DefaultArtifact(dynamicDependency.getGroupId(), dynamicDependency.getArtifactId(), dynamicDependency.getClassifier(), artifactType.getExtension(), dynamicDependency.getVersion(), artifactType);
+        }
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(artifact, null));
         RepositoryType repositoryType = dynamicDependency.getRepositoryType();
