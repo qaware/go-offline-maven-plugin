@@ -7,6 +7,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
             dependencyDownloader.enableDownloadJavadoc();
         }
 
-        Set<Plugin> allPlugins = new HashSet<>();
+        List<Plugin> allPlugins = new ArrayList<>();
         for (MavenProject mavenProject : getReactorProjects()) {
             List<Plugin> buildPlugins = mavenProject.getBuildPlugins();
             allPlugins.addAll(buildPlugins);
