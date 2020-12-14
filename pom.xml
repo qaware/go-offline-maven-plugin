@@ -6,7 +6,7 @@
 
     <groupId>de.qaware.maven</groupId>
     <artifactId>go-offline-maven-plugin</artifactId>
-    <version>1.2.8-SNAPSHOT</version>
+    <version>1.2.8</version>
     <packaging>maven-plugin</packaging>
     <name>Go Offline Maven Plugin</name>
     <description>Maven Plugin used to download all Dependencies and Plugins required in a Maven build,
@@ -156,7 +156,7 @@
     <distributionManagement>
         <repository>
             <id>bintray-qaware-oss</id>
-            <url>https://api.bintray.com/maven/qaware-oss/maven/go-offline-maven-plugin;publish=1</url>
+            <url>https://api.bintray.com/maven/qaware-oss/maven/go-offline-maven-plugin/;publish=1</url>
         </repository>
     </distributionManagement>
 </project>
