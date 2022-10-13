@@ -13,7 +13,7 @@ import java.util.Objects;
  * for those properties. This is not 100% correct, since it theoretically possible to output an artifact with the same
  * groupId:artifactId:version identifier and different type/classifier from different projects. But the information on
  * which additional artifacts are produced by a project are not available to the go-offline-maven plugin, since they are
- * added dynamically at build time. So we have to live with this fuzzyness.
+ * added dynamically at build time. So we have to live with this fuzziness.
  *
  * @author andreas.janning
  */

@@ -46,11 +46,15 @@ public abstract class AbstractGoOfflineMojo extends AbstractMojo {
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
 
-
     private ProjectBuildingRequest buildingRequest;
 
-
+    AbstractGoOfflineMojo() {
+        // Noop
+    }
+    
     /**
+     * Returns a building request initialized with the data of the current maven session
+     * 
      * @return a building request initialized with the data of the current maven session
      */
     protected ProjectBuildingRequest getBuildingRequest() {
@@ -65,6 +69,8 @@ public abstract class AbstractGoOfflineMojo extends AbstractMojo {
     }
 
     /**
+     * Returns the full list of projects in the current build-reactor
+     * 
      * @return the full list of projects in the current build-reactor
      */
     protected List<MavenProject> getReactorProjects() {
