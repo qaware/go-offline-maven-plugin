@@ -83,6 +83,10 @@ public class DependencyDownloader {
     private boolean downloadJavadoc = false;
     private Set<ReactorArtifact> reactorArtifacts;
 
+    DependencyDownloader() {
+        // Noop
+    }
+
     /**
      * Initialize the DependencyDownloader
      *
@@ -120,16 +124,25 @@ public class DependencyDownloader {
         this.errors = new ArrayList<>();
     }
 
+    /**
+     * Enable the download of the source artifacts.
+     */
     public void enableDownloadSources() {
         this.downloadSources = true;
     }
 
-
+    /**
+     * Enable the download of the Javadoc artifacts.
+     */
     public void enableDownloadJavadoc() {
         this.downloadJavadoc = true;
     }
 
-
+    /**
+     * Download the collection of artifacts
+     * 
+     * @param artifacts the collection of ReactorArtifacts that wants to be downloaded.
+     */
     public void downloadArtifacts(Collection<ArtifactWithRepoType> artifacts) {
         List<ArtifactRequest> mainRequests = new ArrayList<>(artifacts.size());
         List<ArtifactRequest> pluginRequests = new ArrayList<>(artifacts.size());
@@ -173,7 +186,6 @@ public class DependencyDownloader {
         }
     }
 
-
     /**
      * Download all dependencies of a maven project including transitive dependencies.
      * Dependencies that refer to an artifact in the current reactor build are ignored.
@@ -181,6 +193,7 @@ public class DependencyDownloader {
      * Transitive dependencies with the scopes "test", "system" and "provided" are ignored.
      *
      * @param project the project to download the dependencies for.
+     * @return The set of resolved ArtifactRepositoryType pairs
      */
     public Set<ArtifactWithRepoType> resolveDependencies(MavenProject project) {
         Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
@@ -188,7 +201,6 @@ public class DependencyDownloader {
         collectRequest.setRepositories(remoteRepositories);
         collectRequest.setRootArtifact(projectArtifact);
         collectRequest.setRequestContext(RepositoryType.MAIN.getRequestContext());
-
 
         List<Dependency> aetherDependencies = new ArrayList<>();
         for (org.apache.maven.model.Dependency d : project.getDependencies()) {
@@ -243,6 +255,7 @@ public class DependencyDownloader {
      * Transitive dependencies with the scopes "test", "system" and "provided" are ignored.
      *
      * @param plugin the plugin to download
+     * @return The set of resolved ArtifactRepositoryType pairs
      */
     public Set<ArtifactWithRepoType> resolvePlugin(Plugin plugin) {
         Artifact pluginArtifact = toArtifact(plugin);
@@ -275,6 +288,7 @@ public class DependencyDownloader {
      * Transitive dependencies with the scopes "test", "system" and "provided" are ignored.
      *
      * @param dynamicDependency the dependency to download
+     * @return The set of resolved ArtifactRepositoryType pairs
      */
     public Set<ArtifactWithRepoType> resolveDynamicDependency(DynamicDependency dynamicDependency) {
         ArtifactType artifactType = typeRegistry.get(dynamicDependency.getType());
@@ -314,6 +328,8 @@ public class DependencyDownloader {
     }
 
     /**
+     * Returns a List of errors encountered during the downloading of artifacts since this class has been initialized.
+     * 
      * @return a List of errors encountered during the downloading of artifacts since this class has been initialized.
      */
     public List<Exception> getErrors() {

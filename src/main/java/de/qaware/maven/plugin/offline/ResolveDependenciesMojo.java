@@ -43,6 +43,10 @@ public class ResolveDependenciesMojo extends AbstractGoOfflineMojo {
     @Parameter(defaultValue = "false", property = "failOnErrors")
     private boolean failOnErrors;
 
+    ResolveDependenciesMojo() {
+        // Noop
+    }
+
     public void execute() throws MojoExecutionException {
         validateConfiguration();
         dependencyDownloader.init(getBuildingRequest(), getReactorProjects(), getLog());
