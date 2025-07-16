@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.9.4</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-settings</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-settings-builder</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-builder-support</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-repository-metadata</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -127,7 +127,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model-builder</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -135,7 +135,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-resolver-provider</artifactId>
-            <version>${mavenVersion}</version>
+            <version>3.8.6</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>${maven.plugin.tools.version}</version>
+            <version>3.6.4</version>
             <optional>true</optional>
         </dependency>
     </dependencies>
