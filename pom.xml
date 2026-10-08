@@ -52,6 +52,10 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.plugin.tools.version>3.6.4</maven.plugin.tools.version>
+        <!-- JUnit 5.x and Mockito 4.x are the last lines supporting Java 8 -->
+        <junit.version>5.13.4</junit.version>
+        <mockito.version>4.11.0</mockito.version>
+        <byte-buddy.version>1.17.8</byte-buddy.version>
     </properties>
 
     <prerequisites>
@@ -146,6 +150,33 @@
             <artifactId>maven-plugin-annotations</artifactId>
             <version>${maven.plugin.tools.version}</version>
             <optional>true</optional>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- newer byte-buddy than mockito 4 ships with, so mocking works on recent JDKs -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byte-buddy.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>${byte-buddy.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
